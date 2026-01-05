@@ -8,16 +8,20 @@ const UserSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Vui lòng nhập tên'],
+      trim: true,
       maxlength: [50, 'Tên không quá 50 ký tự'],
     },
     email: {
       type: String,
       required: true,
+      trim: true,
+      lowercase: true,
       unique: true,
     },
     // Password cho đăng nhập (hash bằng bcrypt)
     password: {
       type: String,
+      required: true,
       select: false,
     },
     createdAt: {

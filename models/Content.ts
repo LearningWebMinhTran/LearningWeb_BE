@@ -30,7 +30,21 @@ const ContentSchema = new mongoose.Schema(
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     thumbnail: String,
+    image_alt: String,
+    excerpt: String,
     description: String, // SEO Meta description
+    content_blocks: [String],
+    read_time: String,
+    author: {
+      name: String,
+      role: String,
+      avatar: String,
+    },
+    owner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
 
     // 2. Phân loại
     type: {
