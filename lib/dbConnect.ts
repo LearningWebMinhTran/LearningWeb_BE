@@ -1,19 +1,28 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error("Vui lòng khai báo biến môi trường MONGODB_URI");
+  throw new Error('Vui lòng khai báo biến môi trường MONGODB_URI');
 }
+
+type MongooseCache = {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+};
+
+const globalWithMongoose = global as typeof globalThis & {
+  mongoose?: MongooseCache;
+};
 
 /**
  * Global variable để lưu cache kết nối.
  * Việc này ngăn chặn việc tạo kết nối mới mỗi khi Vercel Function được gọi lại (Hot Reload).
  */
-let cached = global.mongoose;
+let cached = globalWithMongoose.mongoose;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = globalWithMongoose.mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {
@@ -28,8 +37,8 @@ async function dbConnect() {
       bufferCommands: false, // Tắt buffering để lỗi ném ra ngay nếu DB chết
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+      return mongooseInstance;
     });
   }
 
