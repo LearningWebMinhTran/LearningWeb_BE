@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger'
 import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
+import { cors } from 'hono/cors';
 
 import routes from './routes/index.js';
 import openApiSpec from './lib/openapi.js';
@@ -22,6 +23,12 @@ app.onError((err, c) => {
 
 
 app.use('*', logger())
+app.use(
+  '*',
+  cors({
+    origin: ['https://learn.minhtran.tech', 'http://localhost:5173'],
+  })
+)
 app.get('/openapi.json', (c) => c.json(openApiSpec));
 app.get('/docs', swaggerUI({ url: '/openapi.json' }));
 app.route('/api', routes);
